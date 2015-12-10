@@ -3,9 +3,12 @@ package com.blunderer.materialdesignlibrary.handlers;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.opengl.Visibility;
 import android.support.v4.app.Fragment;
+import android.view.View;
 
 import com.blunderer.materialdesignlibrary.models.ListItem;
+import com.blunderer.materialdesignlibrary.models.NavigationDrawerListItemCollapsibleHeader;
 import com.blunderer.materialdesignlibrary.models.NavigationDrawerListItemDivider;
 import com.blunderer.materialdesignlibrary.models.NavigationDrawerListItemHeader;
 import com.blunderer.materialdesignlibrary.models.NavigationDrawerListItemTopFragment;
@@ -76,6 +79,15 @@ public class NavigationDrawerTopHandler {
         mItems.add(item);
         return this;
     }
+
+    public NavigationDrawerTopHandler addCollapsibleSection(String title) {
+        NavigationDrawerListItemCollapsibleHeader item = new NavigationDrawerListItemCollapsibleHeader();
+        item.setTitle(title);
+        item.setVisibility(View.VISIBLE);
+        mItems.add(item);
+        return this;
+    }
+
 
     public NavigationDrawerTopHandler addDivider() {
         NavigationDrawerListItemDivider item = new NavigationDrawerListItemDivider();

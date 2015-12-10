@@ -9,6 +9,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.BaseAdapter;
 import android.widget.ListView;
 
 import com.blunderer.materialdesignlibrary.R;
@@ -28,6 +29,7 @@ import com.blunderer.materialdesignlibrary.models.NavigationDrawerAccountsListIt
 import com.blunderer.materialdesignlibrary.models.NavigationDrawerAccountsListItemIntent;
 import com.blunderer.materialdesignlibrary.models.NavigationDrawerAccountsListItemOnClick;
 import com.blunderer.materialdesignlibrary.models.NavigationDrawerListItemBottom;
+import com.blunderer.materialdesignlibrary.models.NavigationDrawerListItemCollapsibleHeader;
 import com.blunderer.materialdesignlibrary.models.NavigationDrawerListItemHeader;
 import com.blunderer.materialdesignlibrary.models.NavigationDrawerListItemTopFragment;
 import com.blunderer.materialdesignlibrary.models.NavigationDrawerListItemTopIntent;
@@ -347,7 +349,14 @@ public abstract class NavigationDrawerActivity extends AActivity
     private void onListItemTopClick(AdapterView<?> adapterView, View view, int i) {
         ListItem item = (ListItem) adapterView.getAdapter().getItem(i);
 
-        if (item instanceof NavigationDrawerListItemTopFragment) {
+        if (item instanceof NavigationDrawerListItemCollapsibleHeader) {
+            NavigationDrawerListItemCollapsibleHeader itm = (NavigationDrawerListItemCollapsibleHeader) item;
+            if (itm.getVisibility() == View.VISIBLE)
+                itm.setVisibility(View.GONE);
+            else
+                itm.setVisibility(View.VISIBLE);
+            ((BaseAdapter)adapterView.getAdapter()).notifyDataSetChanged();
+        } else if (item instanceof NavigationDrawerListItemTopFragment) {
             NavigationDrawerListItemTopFragment itemFragment =
                     (NavigationDrawerListItemTopFragment) item;
             Fragment fragment = itemFragment.getFragment();

@@ -7,10 +7,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.blunderer.materialdesignlibrary.R;
 import com.blunderer.materialdesignlibrary.models.ListItem;
+import com.blunderer.materialdesignlibrary.models.NavigationDrawerListItemCollapsibleHeader;
 import com.blunderer.materialdesignlibrary.models.NavigationDrawerListItemDivider;
 import com.blunderer.materialdesignlibrary.models.NavigationDrawerListItemHeader;
 import com.blunderer.materialdesignlibrary.models.NavigationDrawerListItemTopFragment;
@@ -45,7 +47,8 @@ public class NavigationDrawerTopAdapter extends ArrayAdapter<ListItem> {
     @Override
     public boolean isEnabled(int position) {
         return getItem(position) instanceof NavigationDrawerListItemTopFragment ||
-                getItem(position) instanceof NavigationDrawerListItemTopIntent;
+                getItem(position) instanceof NavigationDrawerListItemTopIntent ||
+                getItem(position) instanceof NavigationDrawerListItemCollapsibleHeader;
     }
 
     @Override
@@ -54,7 +57,7 @@ public class NavigationDrawerTopAdapter extends ArrayAdapter<ListItem> {
 
         ListItem item = getItem(position);
 
-        if (convertView == null) {
+        if (convertView == null || convertView.findViewById(R.id.navigation_drawer_row_title) == null) {
             convertView = LayoutInflater.from(getContext())
                     .inflate(mLayoutResourceId, parent, false);
 
@@ -127,6 +130,17 @@ public class NavigationDrawerTopAdapter extends ArrayAdapter<ListItem> {
                 } catch (Resources.NotFoundException e) {
                     holder.icon.setVisibility(View.GONE);
                 }
+            }
+        } else if (item instanceof NavigationDrawerListItemCollapsibleHeader) {
+            NavigationDrawerListItemCollapsibleHeader itm = (NavigationDrawerListItemCollapsibleHeader) item;
+            if (itm.getVisibility()==View.GONE) {
+                convertView = new LinearLayout(getContext());
+                convertView.setTag(holder);
+            } else {
+                holder.title.setVisibility(View.GONE);
+                holder.titleHeader.setVisibility(View.VISIBLE);
+                holder.icon.setVisibility(View.GONE);
+                holder.headerSeparator.setVisibility(position == 0 ? View.GONE : View.VISIBLE);
             }
         } else if (item instanceof NavigationDrawerListItemHeader) {
             holder.title.setVisibility(View.GONE);
