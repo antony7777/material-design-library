@@ -8,6 +8,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.Transformation;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
@@ -346,16 +348,41 @@ public abstract class NavigationDrawerActivity extends AActivity
         replaceTitle(mCurrentItem);
     }
 
-    private void onListItemTopClick(AdapterView<?> adapterView, View view, int i) {
+    private void onListItemTopClick(final AdapterView<?> adapterView, View view, int i) {
         ListItem item = (ListItem) adapterView.getAdapter().getItem(i);
 
         if (item instanceof NavigationDrawerListItemCollapsibleHeader) {
             NavigationDrawerListItemCollapsibleHeader itm = (NavigationDrawerListItemCollapsibleHeader) item;
-            if (itm.getVisibility() == View.VISIBLE)
+            if (itm.getVisibility() == View.VISIBLE) {
                 itm.setVisibility(View.GONE);
-            else
+                itm.collapse(adapterView, view, i);
+            } else {
                 itm.setVisibility(View.VISIBLE);
-            ((BaseAdapter)adapterView.getAdapter()).notifyDataSetChanged();
+                itm.expand(adapterView, view, i);
+                ((BaseAdapter) adapterView.getAdapter()).notifyDataSetChanged();
+            }
+
+//            a = new Animation() {
+//                @Override
+//                protected void applyTransformation(float interpolatedTime, Transformation t) {
+//                    if(interpolatedTime == 1){
+//                        v.setVisibility(View.VISIBLE);
+//                    }else{
+//                        v.getLayoutParams().height = (int)(initialHeight * interpolatedTime);
+//                        v.requestLayout();
+//                    }
+//                }
+//
+//                @Override
+//                public boolean willChangeBounds() {
+//                    return true;
+//                }
+//            };
+
+//            a.setDuration((int) (initialHeight / v.getContext().getResources().getDisplayMetrics().density));
+//            v.startAnimation(a);
+
+
         } else if (item instanceof NavigationDrawerListItemTopFragment) {
             NavigationDrawerListItemTopFragment itemFragment =
                     (NavigationDrawerListItemTopFragment) item;
