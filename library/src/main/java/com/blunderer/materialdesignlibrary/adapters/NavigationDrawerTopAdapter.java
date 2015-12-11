@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.blunderer.materialdesignlibrary.R;
+import com.blunderer.materialdesignlibrary.interfaces.NavigationDrawer;
 import com.blunderer.materialdesignlibrary.models.ListItem;
 import com.blunderer.materialdesignlibrary.models.NavigationDrawerListItemCollapsibleHeader;
 import com.blunderer.materialdesignlibrary.models.NavigationDrawerListItemDivider;
@@ -193,6 +194,22 @@ public class NavigationDrawerTopAdapter extends ArrayAdapter<ListItem> {
 
     public void setNavigationDrawerSelectedItemPosition(int navigationDrawerSelectedItemPosition) {
         mNavigationDrawerSelectedItemPosition = navigationDrawerSelectedItemPosition;
+    }
+
+    public int countSectionChildNo(final int position) {
+        ListItem li = getItem(position);
+        if (li instanceof NavigationDrawerListItemHeader) {
+            int count = 0;
+            while (position + count + 1 < getCount()) {
+                li = getItem(position+count+1);
+                if (li instanceof NavigationDrawerListItemHeader) {
+                    break;
+                }
+                count++;
+            }
+            return count;
+        }
+        return 0;
     }
 
     private class ViewHolder {
