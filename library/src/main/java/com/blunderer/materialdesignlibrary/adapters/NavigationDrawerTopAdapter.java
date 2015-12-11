@@ -69,11 +69,16 @@ public class NavigationDrawerTopAdapter extends ArrayAdapter<ListItem> {
                     .findViewById(R.id.navigation_drawer_row_icon);
             holder.headerSeparator = convertView
                     .findViewById(R.id.navigation_drawer_row_header_separator);
+            holder.collapsedIcon = (ImageView) convertView
+                    .findViewById(R.id.navigation_drawer_collapsed_icon);
             convertView.setTag(holder);
         } else holder = (ViewHolder) convertView.getTag();
 
         convertView.setBackgroundResource(item.useBackgroundStyle() ?
                 item.getBackgroundStyle() : R.drawable.navigation_drawer_selector);
+
+        // to avoid icon being shown on recycled view to another type of ListItem
+        holder.collapsedIcon.setVisibility(View.GONE);
 
         if (item.useTitle()) {
             try {
@@ -92,55 +97,65 @@ public class NavigationDrawerTopAdapter extends ArrayAdapter<ListItem> {
         }
 
         if (item instanceof NavigationDrawerListItemTopFragment) {
-            NavigationDrawerListItemTopFragment itemNormal =
-                    (NavigationDrawerListItemTopFragment) item;
-            holder.title.setVisibility(View.VISIBLE);
-            holder.titleHeader.setVisibility(View.GONE);
-            holder.headerSeparator.setVisibility(View.GONE);
-            if (mNavigationDrawerSelectedItemPosition == position &&
-                    (itemNormal.useSelectedIconResource() || itemNormal.useSelectedIconUrl())) {
-                try {
-                    if (itemNormal.useSelectedIconUrl()) {
-                        itemNormal.getSelectedIconUrl().into(holder.icon);
-                    } else holder.icon.setImageDrawable(itemNormal.getSelectedIconDrawable());
-                    holder.icon.setVisibility(View.VISIBLE);
-                } catch (Resources.NotFoundException e) {
-                    holder.icon.setVisibility(View.GONE);
+            if (itemVisibility(position)==View.VISIBLE) {
+                NavigationDrawerListItemTopFragment itemNormal =
+                        (NavigationDrawerListItemTopFragment) item;
+                holder.title.setVisibility(View.VISIBLE);
+                holder.titleHeader.setVisibility(View.GONE);
+                holder.headerSeparator.setVisibility(View.GONE);
+                if (mNavigationDrawerSelectedItemPosition == position &&
+                        (itemNormal.useSelectedIconResource() || itemNormal.useSelectedIconUrl())) {
+                    try {
+                        if (itemNormal.useSelectedIconUrl()) {
+                            itemNormal.getSelectedIconUrl().into(holder.icon);
+                        } else holder.icon.setImageDrawable(itemNormal.getSelectedIconDrawable());
+                        holder.icon.setVisibility(View.VISIBLE);
+                    } catch (Resources.NotFoundException e) {
+                        holder.icon.setVisibility(View.GONE);
+                    }
+                } else if (itemNormal.useIconResource() || itemNormal.useIconUrl()) {
+                    try {
+                        if (itemNormal.useIconUrl()) itemNormal.getIconUrl().into(holder.icon);
+                        else holder.icon.setImageDrawable(itemNormal.getIconDrawable());
+                        holder.icon.setVisibility(View.VISIBLE);
+                    } catch (Resources.NotFoundException e) {
+                        holder.icon.setVisibility(View.GONE);
+                    }
                 }
-            } else if (itemNormal.useIconResource() || itemNormal.useIconUrl()) {
-                try {
-                    if (itemNormal.useIconUrl()) itemNormal.getIconUrl().into(holder.icon);
-                    else holder.icon.setImageDrawable(itemNormal.getIconDrawable());
-                    holder.icon.setVisibility(View.VISIBLE);
-                } catch (Resources.NotFoundException e) {
-                    holder.icon.setVisibility(View.GONE);
-                }
-            }
-        } else if (item instanceof NavigationDrawerListItemTopIntent) {
-            NavigationDrawerListItemTopIntent itemNormal =
-                    (NavigationDrawerListItemTopIntent) item;
-            holder.title.setVisibility(View.VISIBLE);
-            holder.titleHeader.setVisibility(View.GONE);
-            holder.headerSeparator.setVisibility(View.GONE);
-            if (itemNormal.useIconResource() || itemNormal.useIconUrl()) {
-                try {
-                    if (itemNormal.useIconUrl()) itemNormal.getIconUrl().into(holder.icon);
-                    else holder.icon.setImageDrawable(itemNormal.getIconDrawable());
-                    holder.icon.setVisibility(View.VISIBLE);
-                } catch (Resources.NotFoundException e) {
-                    holder.icon.setVisibility(View.GONE);
-                }
-            }
-        } else if (item instanceof NavigationDrawerListItemCollapsibleHeader) {
-            NavigationDrawerListItemCollapsibleHeader itm = (NavigationDrawerListItemCollapsibleHeader) item;
-            if (itm.getVisibility()==View.GONE) {
+            } else {
                 convertView = new LinearLayout(getContext());
                 convertView.setTag(holder);
+            }
+        } else if (item instanceof NavigationDrawerListItemTopIntent) {
+            if (itemVisibility(position) == View.VISIBLE) {
+                NavigationDrawerListItemTopIntent itemNormal =
+                        (NavigationDrawerListItemTopIntent) item;
+                holder.title.setVisibility(View.VISIBLE);
+                holder.titleHeader.setVisibility(View.GONE);
+                holder.headerSeparator.setVisibility(View.GONE);
+                if (itemNormal.useIconResource() || itemNormal.useIconUrl()) {
+                    try {
+                        if (itemNormal.useIconUrl()) itemNormal.getIconUrl().into(holder.icon);
+                        else holder.icon.setImageDrawable(itemNormal.getIconDrawable());
+                        holder.icon.setVisibility(View.VISIBLE);
+                    } catch (Resources.NotFoundException e) {
+                        holder.icon.setVisibility(View.GONE);
+                    }
+                }
             } else {
-                holder.title.setVisibility(View.GONE);
-                holder.titleHeader.setVisibility(View.VISIBLE);
-                holder.icon.setVisibility(View.GONE);
-                holder.headerSeparator.setVisibility(position == 0 ? View.GONE : View.VISIBLE);
+                convertView = new LinearLayout(getContext());
+                convertView.setTag(holder);
+            }
+        } else if (item instanceof NavigationDrawerListItemCollapsibleHeader) {
+            holder.title.setVisibility(View.GONE);
+            holder.titleHeader.setVisibility(View.VISIBLE);
+            holder.headerSeparator.setVisibility(position == 0 ? View.GONE : View.VISIBLE);
+            holder.icon.setVisibility(View.GONE);
+            holder.collapsedIcon.setVisibility(View.VISIBLE);
+            if (((NavigationDrawerListItemCollapsibleHeader)item).getVisibility() == View.VISIBLE) {
+                holder.collapsedIcon.setImageResource(R.drawable.ic_arrow_drop_up);
+            } else {
+                holder.collapsedIcon.setImageResource(R.drawable.ic_arrow_drop_down);
             }
         } else if (item instanceof NavigationDrawerListItemHeader) {
             holder.title.setVisibility(View.GONE);
@@ -157,6 +172,25 @@ public class NavigationDrawerTopAdapter extends ArrayAdapter<ListItem> {
         return convertView;
     }
 
+    /**
+     * Scan up to see if this item belongs to a collapsible header and return the header's visibility
+     * returns View.VISIBLE if it does not belong to any collapsible header
+     * @param position
+     * @return
+     */
+    private int itemVisibility(int position) {
+        do {
+            position--;
+            ListItem item = getItem(position);
+            if (item instanceof NavigationDrawerListItemCollapsibleHeader) {
+                return ((NavigationDrawerListItemCollapsibleHeader)item).getVisibility();
+            } else if (item instanceof NavigationDrawerListItemHeader) {
+                break;
+            }
+        }  while (position >= 0);
+        return View.VISIBLE;
+    }
+
     public void setNavigationDrawerSelectedItemPosition(int navigationDrawerSelectedItemPosition) {
         mNavigationDrawerSelectedItemPosition = navigationDrawerSelectedItemPosition;
     }
@@ -167,7 +201,7 @@ public class NavigationDrawerTopAdapter extends ArrayAdapter<ListItem> {
         private TextView titleHeader;
         private ImageView icon;
         private View headerSeparator;
-
+        private ImageView collapsedIcon;
     }
 
 }
