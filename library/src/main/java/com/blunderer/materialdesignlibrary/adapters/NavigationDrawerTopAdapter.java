@@ -221,6 +221,8 @@ public class NavigationDrawerTopAdapter extends ArrayAdapter<ListItem> {
      * @return
      */
     private boolean isAnimating(int position) {
+        if (position==0)
+            return false;
         do {
             position--;
             ListItem item = getItem(position);
@@ -229,7 +231,7 @@ public class NavigationDrawerTopAdapter extends ArrayAdapter<ListItem> {
             } else if (item instanceof NavigationDrawerListItemHeader) {
                 break;
             }
-        }  while (position >= 0);
+        }  while (position > 0);
         return false;
     }
 
@@ -240,6 +242,8 @@ public class NavigationDrawerTopAdapter extends ArrayAdapter<ListItem> {
      * @return
      */
     private int itemVisibility(int position) {
+        if (position==0)
+            return View.VISIBLE;
         do {
             position--;
             ListItem item = getItem(position);
@@ -248,7 +252,7 @@ public class NavigationDrawerTopAdapter extends ArrayAdapter<ListItem> {
             } else if (item instanceof NavigationDrawerListItemHeader) {
                 break;
             }
-        }  while (position >= 0);
+        }  while (position > 0);
         return View.VISIBLE;
     }
 

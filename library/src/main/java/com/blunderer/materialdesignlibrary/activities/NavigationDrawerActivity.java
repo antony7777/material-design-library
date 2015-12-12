@@ -361,28 +361,6 @@ public abstract class NavigationDrawerActivity extends AActivity
                 itm.expand(adapterView, view, i);
                 ((BaseAdapter) adapterView.getAdapter()).notifyDataSetChanged();
             }
-
-//            a = new Animation() {
-//                @Override
-//                protected void applyTransformation(float interpolatedTime, Transformation t) {
-//                    if(interpolatedTime == 1){
-//                        v.setVisibility(View.VISIBLE);
-//                    }else{
-//                        v.getLayoutParams().height = (int)(initialHeight * interpolatedTime);
-//                        v.requestLayout();
-//                    }
-//                }
-//
-//                @Override
-//                public boolean willChangeBounds() {
-//                    return true;
-//                }
-//            };
-
-//            a.setDuration((int) (initialHeight / v.getContext().getResources().getDisplayMetrics().density));
-//            v.startAnimation(a);
-
-
         } else if (item instanceof NavigationDrawerListItemTopFragment) {
             NavigationDrawerListItemTopFragment itemFragment =
                     (NavigationDrawerListItemTopFragment) item;
