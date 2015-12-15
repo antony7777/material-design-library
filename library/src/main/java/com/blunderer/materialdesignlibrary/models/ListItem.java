@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 
+import com.blunderer.materialdesignlibrary.R;
+import com.blunderer.materialdesignlibrary.handlers.TabLayoutHandler;
 import com.bumptech.glide.DrawableTypeRequest;
 
 public abstract class ListItem {
@@ -22,6 +24,25 @@ public abstract class ListItem {
     private boolean mUseIconUrl = false;
     private boolean mUseSelectedIconResource = false;
     private boolean mUseSelectedIconUrl = false;
+    private int mFragmentContainerId = R.id.fragment_container;
+
+    private TabLayoutHandler mTabLayoutHandler;
+
+    public TabLayoutHandler getTabLayoutHandler() {
+        return mTabLayoutHandler;
+    }
+
+    public void setTabLayoutHandler(TabLayoutHandler tabLayoutHandler) {
+        this.mTabLayoutHandler = tabLayoutHandler;
+    }
+
+    public int getFragmentContainerId() {
+        return mFragmentContainerId;
+    }
+
+    public void setFragmentContainerId(int fragmentContainerId) {
+        this.mFragmentContainerId = fragmentContainerId;
+    }
 
     public void setTitle(Context context, int titleResource) {
         mUseTitle = true;

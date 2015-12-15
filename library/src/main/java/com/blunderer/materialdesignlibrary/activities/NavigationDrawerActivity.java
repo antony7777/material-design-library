@@ -8,8 +8,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.Transformation;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
@@ -22,6 +20,7 @@ import com.blunderer.materialdesignlibrary.handlers.NavigationDrawerAccountsHand
 import com.blunderer.materialdesignlibrary.handlers.NavigationDrawerBottomHandler;
 import com.blunderer.materialdesignlibrary.handlers.NavigationDrawerStyleHandler;
 import com.blunderer.materialdesignlibrary.handlers.NavigationDrawerTopHandler;
+import com.blunderer.materialdesignlibrary.handlers.TabLayoutHandler;
 import com.blunderer.materialdesignlibrary.interfaces.NavigationDrawer;
 import com.blunderer.materialdesignlibrary.listeners.OnAccountChangeListener;
 import com.blunderer.materialdesignlibrary.listeners.OnMoreAccountClickListener;
@@ -60,6 +59,7 @@ public abstract class NavigationDrawerActivity extends AActivity
     private List<NavigationDrawerListItemBottom> mNavigationDrawerItemsBottom;
     private NavigationDrawerAccountsHandler mNavigationDrawerAccountsHandler;
     private int[] mAccountsPositions;
+    private TabLayoutHandler mLastPager;
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
@@ -364,12 +364,31 @@ public abstract class NavigationDrawerActivity extends AActivity
         } else if (item instanceof NavigationDrawerListItemTopFragment) {
             NavigationDrawerListItemTopFragment itemFragment =
                     (NavigationDrawerListItemTopFragment) item;
-            Fragment fragment = itemFragment.getFragment();
-            if (mCurrentItem == null || mCurrentItem.getFragment() != fragment) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, fragment).commit();
-                mCurrentItem = itemFragment;
-                mCurrentItemPosition = i;
+            if (item.getFragmentContainerId() == R.id.fragment_container) {
+                Fragment fragment = itemFragment.getFragment();
+                if (mCurrentItem == null || mCurrentItem.getFragment() != fragment) {
+                    showFragmentContainer(R.id.fragment_container);
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_container, fragment).commit();
+                    mCurrentItem = itemFragment;
+                    mCurrentItemPosition = i;
+                    if (mCurrentItem.getTabLayoutHandler() != null) {
+                        mCurrentItem.getTabLayoutHandler().onStop();
+                        mCurrentItem.getTabLayoutHandler().cleanup();
+                    }
+                }
+            } else {
+                TabLayoutHandler handler = itemFragment.getTabLayoutHandler();
+                if (mCurrentItem == null || mLastPager != handler) {
+                    mLastPager = handler;
+                    mCurrentItem = itemFragment;
+                    handler.setup(this);
+                    handler.onStart();
+                } else {
+                    mLastPager = handler;
+                    handler.onResume();
+                }
+                showFragmentContainer(R.id.tab_layout_container);
             }
             mTopListView.setItemChecked(mCurrentItemPosition, true);
             mListTopAdapter.setNavigationDrawerSelectedItemPosition(mCurrentItemPosition -
@@ -393,6 +412,16 @@ public abstract class NavigationDrawerActivity extends AActivity
                     ((NavigationDrawerAccountsListItemAccount) item).getOnClickListener();
 
             if (onClickListener != null) onClickListener.onMoreAccountClick(view, i);
+        }
+    }
+
+    private void showFragmentContainer(int id) {
+        if (id == R.id.fragment_container) {
+            findViewById(R.id.tab_layout_container).setVisibility(View.GONE);
+            findViewById(R.id.fragment_container).setVisibility(View.VISIBLE);
+        } else {
+            findViewById(R.id.fragment_container).setVisibility(View.GONE);
+            findViewById(R.id.tab_layout_container).setVisibility(View.VISIBLE);
         }
     }
 
