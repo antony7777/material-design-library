@@ -151,6 +151,15 @@ public class NavigationDrawerTopHandler {
         return this;
     }
 
+    public NavigationDrawerTopHandler addItemTabLayout(String title, TabLayoutHandler handler, int layoutId) {
+        NavigationDrawerListItemTopFragment item = new NavigationDrawerListItemTopFragment();
+        item.setTitle(title);
+        item.setTabLayoutHandler(handler);
+        item.setFragmentContainerId(layoutId);
+        mItems.add(item);
+        return this;
+    }
+
     public NavigationDrawerTopHandler addItem(String title,
                                               Fragment fragment,
                                               int titleStyle,
